@@ -30,19 +30,19 @@ def _parse_datetime(x: str):
 
 def get_df(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, on_bad_lines="warn", sep="\t")
-    df = df.drop(columns=[keys.K_PROJECT, keys.K_ACCOUNT, keys.K_PAYMENT_ACCOUNT, keys.K_MERCHANT,
-                          keys.K_ADDRESS, keys.K_NOTE, keys.K_TAGS, keys.K_AUTHOR,
-                          keys.K_IMAGE1, keys.K_IMAGE2, keys.K_IMAGE3, keys.K_CURRENCY])
-    df[keys.K_DATETIME] = df[keys.K_DATETIME].apply(lambda x: _parse_datetime(x))
-    df[keys.K_DATETIME] = pd.to_datetime(df[keys.K_DATETIME]).astype(np.int64)
-    df[keys.K_DATETIME] = df[keys.K_DATETIME].apply(lambda x: x/1000000000)
-    df[keys.K_AMOUNT] = df[keys.K_AMOUNT].apply(
+    df = df.drop(columns=[keys.PROJECT, keys.ACCOUNT, keys.PAYMENT_ACCOUNT, keys.MERCHANT,
+                          keys.ADDRESS, keys.NOTE, keys.TAGS, keys.AUTHOR,
+                          keys.IMAGE1, keys.IMAGE2, keys.IMAGE3, keys.CURRENCY])
+    df[keys.DATETIME] = df[keys.DATETIME].apply(lambda x: _parse_datetime(x))
+    df[keys.DATETIME] = pd.to_datetime(df[keys.DATETIME]).astype(np.int64)
+    df[keys.DATETIME] = df[keys.DATETIME].apply(lambda x: x/1000000000)
+    df[keys.AMOUNT] = df[keys.AMOUNT].apply(
         lambda x: x.replace(u"\u00A0", '').replace(',', '.'))
-    df[keys.K_AMOUNT] = df[keys.K_AMOUNT].astype(float)
-    df[keys.K_CURRENCY_RATE] = df[keys.K_CURRENCY_RATE].apply(
+    df[keys.AMOUNT] = df[keys.AMOUNT].astype(float)
+    df[keys.CURRENCY_RATE] = df[keys.CURRENCY_RATE].apply(
         lambda x: x.replace(',', '.'))
-    df[keys.K_CURRENCY_RATE] = df[keys.K_CURRENCY_RATE].astype(float)
-    df[keys.K_AMOUNT] = df[keys.K_AMOUNT]*df[keys.K_CURRENCY_RATE]
-    df = df.drop(columns=[keys.K_CURRENCY_RATE])
+    df[keys.CURRENCY_RATE] = df[keys.CURRENCY_RATE].astype(float)
+    df[keys.AMOUNT] = df[keys.AMOUNT]*df[keys.CURRENCY_RATE]
+    df = df.drop(columns=[keys.CURRENCY_RATE])
 
     return df
