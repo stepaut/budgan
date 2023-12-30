@@ -79,6 +79,22 @@ def getDFForPie(data: pd.DataFrame, year: str, limit=5):
     return df
 
 
+def get_most_changed(data: pd.DataFrame, year: float, min_sign_proc: float = 0.03) -> pd.DataFrame:
+    df = data.copy()
+    df.index = df.index.astype('int')
+    previous = year - 1
+    df = df[df.index.isin([previous, year])]
+    df = df.drop(columns=(keys.TOTAL))
+    total = df.loc[year].sum()
+    df = df.loc[:, (df > total * min_sign_proc).any()]
+    df = df.loc[:, (df > 0).all()]
+    df = df.transpose()
+    df[keys.INCREASE] = (df[year] - df[previous])/df[previous] * 100
+    df[keys.INCREASE] = df[keys.INCREASE].astype('int')
+    df = df.sort_values(by=[keys.INCREASE], ascending=False)
+    return df
+
+
 # def makePies(data: pd.DataFrame):
 #     years = len(data.T.columns)
 #     # fig, axes = plt.subplots(nrows=len(data.T.columns), figsize=(30,30))
