@@ -7,8 +7,10 @@ from . import keys
 
 
 def transformByCat(data: pd.DataFrame, level: str, col_name: str) -> pd.DataFrame:
-    start_date = datetime.fromtimestamp(data[keys.DATETIME].min())
-    end_date = datetime.fromtimestamp(data[keys.DATETIME].max())
+    s = data[keys.DATETIME].min()
+    e = data[keys.DATETIME].max()
+    start_date = datetime.fromtimestamp(s)
+    end_date = datetime.fromtimestamp(e)
     
     if level == "M":
         date_mode = "%m-%Y"
@@ -118,3 +120,30 @@ def get_most_changed(data: pd.DataFrame, year: float, min_sign_proc: float = 0.0
 #         plt.title(c)
 #         plt.grid(True)
 #         df.plot(subplots=True)
+
+
+# map: (name,type)
+def get_df_mapped(data: pd.DataFrame, map: pd.DataFrame) -> pd.DataFrame:
+    df = data.copy()
+    df = df.drop(columns=df.columns)
+
+    for t in map['type'].unique():
+        df[t] = 0
+
+    for c in data.columns:
+        if c == keys.TOTAL:
+            continue
+        ii = map.loc[map['name'] == c]
+        if len(ii) == 0:
+            continue
+        row = ii.index[0]
+        t = map['type'][row]
+        df[t] += data[c]
+
+    for c in df.columns:
+        df[c] = df[c].cumsum()
+
+    df = df.loc[:, (df != 0).any(axis=0)]
+    df = df.loc[~(df == 0).all(axis=1)]
+
+    return df
