@@ -6,12 +6,40 @@ import holoviews as hv
 from . import keys
 
 
+def get_dict_by_accs(df: pd.DataFrame) -> dict:
+    res = {}
+    for index, row in df.iterrows():
+        res[row['name']] = row['type']
+    return res
+
+
+def get_income(df: pd.DataFrame) -> pd.DataFrame:
+    return df[df[keys.TYPE] == keys.INCOME]
+
+
+def get_expense(df: pd.DataFrame) -> pd.DataFrame:
+    return df[df[keys.TYPE] == keys.EXPENSE]
+
+
+def get_invest(df: pd.DataFrame, investAccs: pd.DataFrame) -> pd.DataFrame:
+    d = get_dict_by_accs(investAccs)
+    # df = df.replace({keys.ACCOUNT: d}).replace({keys.ACCOUNT_RECEIVABLE: d})
+    # return df[(df[keys.TYPE] == keys.TRANSFER) & (
+    #     (df[keys.ACCOUNT].isin(d.values()))) | (df[keys.ACCOUNT_RECEIVABLE].isin(d.values()))]
+    
+    return df[(df[keys.TYPE] == keys.TRANSFER) & (
+        (df[keys.ACCOUNT].isin(d.keys()))) | (df[keys.ACCOUNT_RECEIVABLE].isin(d.keys()))]
+
+    # return df[(df[keys.TYPE] == keys.TRANSFER) & (
+    #     (df[keys.CATEGORY] == keys.INVESTING)) | (df[keys.CATEGORY] == keys.DEINVESTING)]
+
+
 def transformByCat(data: pd.DataFrame, level: str, col_name: str) -> pd.DataFrame:
     s = data[keys.DATETIME].min()
     e = data[keys.DATETIME].max()
     start_date = datetime.fromtimestamp(s)
     end_date = datetime.fromtimestamp(e)
-    
+
     if level == "M":
         date_mode = "%m-%Y"
     elif level == "Y":

@@ -30,7 +30,7 @@ def _parse_datetime(x: str):
 
 def get_df(path: str) -> pd.DataFrame:
     df = pd.read_csv(path, on_bad_lines="warn", sep="\t")
-    df = df.drop(columns=[keys.PROJECT, keys.ACCOUNT, keys.PAYMENT_ACCOUNT, keys.MERCHANT,
+    df = df.drop(columns=[keys.PROJECT, keys.MERCHANT,
                           keys.ADDRESS, keys.NOTE, keys.TAGS, keys.AUTHOR,
                           keys.IMAGE1, keys.IMAGE2, keys.IMAGE3, keys.CURRENCY])
     df[keys.DATETIME] = df[keys.DATETIME].apply(lambda x: _parse_datetime(x))
