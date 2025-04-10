@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy as np
 
 
-def _parse_datetime(x: str):
+def _parse_datetime(x: str, fmt: str):
     rus = {"янв": "jan",
            "февр": "feb", "фев": "feb",
            "мар": "mar",
@@ -21,19 +21,16 @@ def _parse_datetime(x: str):
            ".": ""}
     for r, e in rus.items():
         x = x.lower().replace(r, e)
-    try:
-        dt = datetime.strptime(x.lower(), u'%d %b %Y %H:%M:%S')
-    except:
-        dt = datetime.strptime(x.lower(), u'%d%m%Y %H:%M:%S')
+    dt = datetime.strptime(x.lower(), fmt)
     return dt
 
 
-def get_df(path: str) -> pd.DataFrame:
+def get_df(path: str, fmt: str) -> pd.DataFrame:
     df = pd.read_csv(path, on_bad_lines="warn", sep="\t")
     df = df.drop(columns=[keys.PROJECT, keys.MERCHANT,
                           keys.ADDRESS, keys.NOTE, keys.TAGS, keys.AUTHOR,
                           keys.IMAGE1, keys.IMAGE2, keys.IMAGE3, keys.CURRENCY])
-    df[keys.DATETIME] = df[keys.DATETIME].apply(lambda x: _parse_datetime(x))
+    df[keys.DATETIME] = df[keys.DATETIME].apply(lambda x: _parse_datetime(x, fmt))
     df[keys.DATETIME] = pd.to_datetime(df[keys.DATETIME]).astype(np.int64)
     df[keys.DATETIME] = df[keys.DATETIME].apply(lambda x: x/1000000000)
     df[keys.AMOUNT] = df[keys.AMOUNT].apply(
